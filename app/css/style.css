@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&display=swap');
+:root {
+  --primary-color: #30c88b;
+  --background-color: #000;
+  --secondary-background-color: #333;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Fira Code', monospace;
+}
+
+body {
+  background: var(--background-color) url('../img/bg.jpg') no-repeat 0px 40px /
+    cover;
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.content {
+  opacity: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(100% - 60px);
+  width: 100%;
+  transition: opacity 0.4s ease;
+  padding: 0 20px;
+}
+
+.content li {
+  padding: 12px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  border-bottom: 1px #555 solid;
+  background: var(--secondary-background-color);
+}
+
+.content.show {
+  opacity: 1;
+}
+
+.hide {
+  display: none;
+}
+
+nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-top: -5px;
+  width: 100%;
+}
+
+nav ul {
+  background-color: var(--secondary-background-color);
+  display: flex;
+  padding: 5px 0 0;
+  margin: 0;
+  list-style-type: none;
+  height: 60px;
+}
+
+nav ul li {
+  color: #f4f4f4;
+  cursor: pointer;
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+h1,
+nav ul li:hover,
+nav ul li.active {
+  color: var(--primary-color);
+}
+
+nav ul li p {
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.progress-bar {
+  background: var(--secondary-background-color);
+  border-radius: 13px;
+  height: 20px;
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 1.5em;
+}
+
+.progress {
+  content: '';
+  display: block;
+  background: var(--primary-color);
+  height: 100%;
+  border-radius: 9px;
+}
+
+.alert {
+  text-align: center;
+  padding: 5px;
+  color: orange;
+  border: orange 1px solid;
+}
+
+.form-control {
+  margin: 15px 0;
+}
+
+.form-control label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.form-control input,
+.form-control select {
+  width: 100%;
+  padding: 4px;
+}
+
+.btn {
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+
+  border: 0;
+  background: var(--primary-color);
+  color: #000;
+  font-size: 1rem;
+  font-weight: 200;
+  padding: 7px 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+.btn:hover {
+  background-color: #08af6c;
+  color: #fff;
+}
+
+.btn:active,
+.btn:focus {
+  outline: 0;
+}
