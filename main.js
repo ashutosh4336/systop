@@ -1,11 +1,12 @@
 const path = require('path');
-const { app, BrowserWindow, Menu, ipcMain, Tray } = require('electron');
-const log = require('electron-log');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const Store = require('./Store');
+const MainWindow = require('./MainWindow');
+const AppTray = require('./AppTray');
 
 // SET ENV
-process.env.NODE_ENV = 'development';
-// process.env.NODE_ENV = 'production';
+// process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
 
 const isDev = process.env.NODE_ENV !== 'production' ? true : false;
 const isMac = process.env.NODE_ENV === 'darwin' ? true : false;
@@ -26,25 +27,7 @@ const store = new Store({
 });
 
 function createMainWindow() {
-  mainWindow = new BrowserWindow({
-    title: 'SysTop',
-    width: isDev ? 1000 : 460,
-    height: 700,
-    icon: './assets/icons/icon.png',
-    resizable: isDev,
-    show: false,
-    opacity: 0.9,
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-    },
-  });
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
-
-  mainWindow.loadFile(`${__dirname}/app/index.html`);
+  mainWindow = new MainWindow(`${__dirname}/app/index.html`, isDev);
 }
 
 // About Page / Window
@@ -73,21 +56,23 @@ app.on('ready', () => {
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
 
+  // mainWin
+  mainWindow.on('close', (e) => {
+    if (!app.isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+
+    return true;
+  });
+
   // Create Tray
   const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png');
-  tray = new Tray(icon);
+  tray = new AppTray(icon, mainWindow);
 
-  tray.on('click', () => {
-    if (mainWindow.isVisible() === true) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+  // mainWindow.on('closed', () => {
+  //   mainWindow = null;
+  // });
 });
 
 // App Menus
@@ -107,6 +92,15 @@ const menu = [
     : []),
   {
     role: 'fileMenu',
+  },
+  {
+    label: 'View',
+    submenu: [
+      {
+        label: 'Toggle Navigation',
+        click: () => mainWindow.webContents.send('nav:toggle'),
+      },
+    ],
   },
   ...(!isMac
     ? [

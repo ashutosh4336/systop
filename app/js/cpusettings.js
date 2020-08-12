@@ -1,5 +1,6 @@
 // const { ipcRenderer } = require('electron');
 const settingsForm = document.getElementById('settings-form');
+const nav = document.getElementById('nav');
 
 // Get Settings
 ipcRenderer.on('settings:get', (e, settings) => {
@@ -37,3 +38,8 @@ function showAlert(msg) {
     alert.classList.add('hide');
   }, 4000);
 }
+
+// Toggle Nav
+ipcRenderer.on('nav:toggle', () => {
+  nav.classList.toggle('hide');
+});
