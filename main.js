@@ -1,5 +1,7 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const path = require('path');
+const { app, BrowserWindow, Menu, ipcMain, Tray } = require('electron');
 const log = require('electron-log');
+const Store = require('./Store');
 
 // SET ENV
 process.env.NODE_ENV = 'development';
@@ -9,14 +11,29 @@ const isDev = process.env.NODE_ENV !== 'production' ? true : false;
 const isMac = process.env.NODE_ENV === 'darwin' ? true : false;
 
 let mainWindow;
+let aboutWindow;
+let tray;
+
+// Init Store & Defaults
+const store = new Store({
+  configName: 'user-settings',
+  defaults: {
+    settings: {
+      cpuOverload: 80,
+      alertFrequency: 5,
+    },
+  },
+});
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: 'SysTop',
-    width: isDev ? 1000 : 355,
+    width: isDev ? 1000 : 460,
     height: 700,
     icon: './assets/icons/icon.png',
-    resizeable: isDev ? true : false,
+    resizable: isDev,
+    show: false,
+    opacity: 0.9,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -48,8 +65,25 @@ function createAboutWindow() {
 app.on('ready', () => {
   createMainWindow();
 
+  // send data to renderer
+  mainWindow.webContents.on('dom-ready', () => {
+    mainWindow.webContents.send('settings:get', store.get('settings'));
+  });
+
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
+
+  // Create Tray
+  const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png');
+  tray = new Tray(icon);
+
+  tray.on('click', () => {
+    if (mainWindow.isVisible() === true) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -101,6 +135,13 @@ const menu = [
       ]
     : []),
 ];
+
+// set settings
+ipcMain.on('settings:set', (e, value) => {
+  store.set('settings', value);
+
+  mainWindow.webContents.send('settings:get', store.get('settings'));
+});
 
 // For Mac
 app.on('window-all-closed', () => {
